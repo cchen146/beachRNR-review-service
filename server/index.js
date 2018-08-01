@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const db = require('../data/index.js');
+const db = require('../data/mockData.js');
 
 
 app.get('/*', (req, res) => {
