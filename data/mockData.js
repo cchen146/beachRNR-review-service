@@ -3,56 +3,102 @@ const faker = require('faker');
 const sampleSize = 100;
 
 
-// create 100 users
-let users = [];
+let q = `SELECT COUNT (id) AS count FROM listing_review`;
 
-for(var i = 0; i < sampleSize; i++) {
-  users.push({'name': faker.name.findName(), 'avatar': faker.image.avatar()});
-}
+db.connection.query(q, [], (err, results, fields) => {
+  // check if this is first time set up
+  if(results[0].count === 0) {
+    // create 100 mock users
+    let users = [];
 
-db.createUser(users,(err, results) => {});
+    for(var i = 0; i < sampleSize; i++) {
+      users.push({'name': faker.name.findName(), 'avatar': faker.image.avatar()});
+    }
 
-// create 100 listings
-let listings = [];
+    db.createUser(users,(err, results) => {});
 
-for(var i = 0; i < sampleSize; i++) {
-  listings.push({'review_count': 0, 'average_rating': 0});
-}
 
-db.createListing(listings,(err, results) => {});
+    // load 6 rating type to static table rating_type
+    let ratingTypes = ['Accuracy', 'Location', 'Communication', 'Checkin', 'Cleanliness', 'Value'];
+    let results = [];
+    ratingTypes.forEach(ratingType => {
+      results.push({'name': ratingType});
+    });
 
-// create 100 reviews; (update reivew count)
-let reviews = [];
+    db.createRatingType(results, (err, results) => {if(err){console.log(err)}});
 
-for(var i = 0; i < sampleSize; i++) {
-  reviews.push({'listing_review_id': i+2912000,
-                'user_id': i+1,
-                'review_content': faker.lorem.paragraph() + faker.lorem.paragraph()});
-}
+    // create 100 listings
+    let listings = [];
 
-db.createReview(reviews,(err, results) => {console.log(err);});
+    for(var i = 0; i < sampleSize; i++) {
+      listings.push({'review_count': 0, 'average_rating': 0});
+    }
 
-// generate 100 mock review-reports
-let reportOptions = [`This review contains violent, graphic, promotional, or otherwise offensive content.`,
-                    `This review is purposefully malicious and assaulting.`,
-                    `This review contains false information or may be fake.`
-                    ];
-let reports = [];
+    db.createListing(listings,(err, results) => {});
 
-for(var i = 0; i < sampleSize; i++) {
-  reports.push({'user_id': i+1,
-                'review_id': i+1,
-                'report_content': reportOptions[Math.floor(Math.random()*3)]});
-};
+    // create 100 reviews; (update reivew count)
+    // /////////update ratings for review, listing_attribute_rating, listing_review
+    let reviews = [];
 
-db.createReviewReport(reports,(err, results) => {console.log(err)});
+    for(var i = 2912000; i < (2912000 + sampleSize); i++) {
+      let reviewCount = Math.floor(Math.random()*9) + 5;//generate 5 - 100 reviews per listing
+      for(var j = 0; j < reviewCount; j++) {
+          reviews.push({'listing_review_id': i,
+                        'user_id': Math.floor(Math.random()*sampleSize) + 1,
+                        'review_content': faker.lorem.paragraph() + faker.lorem.paragraph()
+                      });
+      }
+    }
+    db.createReviews(reviews, (err, results, review) => {
+      // each review will be submitted with ratings for six rating type
+      for(var i = 0; i < ratingTypes.length; i++) {
+        let reviewRating = {
+           review_id: results.insertId,
+           rating_type_id: i + 1,
+           star_ratings: Math.floor(Math.random() * 3) + 3
+        };
+        db.createReviewRating(reviewRating, review.listing_review_id, ()=>{})
+      }
+    });
 
-// load 6 rating type to static table rating_type
-let ratingTypes = ['Accuracy', 'Location', 'Communication', 'Checkin', 'Cleanliness', 'Value'];
-let results = [];
-ratingTypes.forEach(ratingType => {
-  results.push({'name': ratingType});
+    // generate 100 mock review-reports
+    let reportOptions = [`This review contains violent, graphic, promotional, or otherwise offensive content.`,
+                        `This review is purposefully malicious and assaulting.`,
+                        `This review contains false information or may be fake.`
+                        ];
+    let reports = [];
+    for(var i = 0; i < sampleSize; i++) {
+      reports.push({'user_id': i + 1,
+                    'review_id': i + 1,
+                    'report_content': reportOptions[Math.floor(Math.random()*3)]});
+    };
+
+    db.createReviewReport(reports,(err, results) => {if(err){console.log(err)}});
+
+  }
 });
 
-db.createRatingType(results, (err, results) => {console.log(err)});
 
+
+ // let reviews = [];
+
+ //    for(var i = 2912000; i < 2912001; i++) {
+
+ //      for(var j = 0; j < 1; j++) {
+ //          reviews.push({'listing_review_id': i,
+ //                        'user_id': 1,
+ //                        'review_content': faker.lorem.paragraph() + faker.lorem.paragraph()
+ //                      });
+ //      }
+ //    }
+ //    db.createReviews(reviews, (err, results, review) => {
+ //      // each review will be submitted with ratings for six rating type
+ //      for(var i = 0; i < 6; i++) {
+ //        let reviewRating = {
+ //           review_id: results.insertId,
+ //           rating_type_id: i + 1,
+ //           star_ratings: 100
+ //        };
+ //        db.createReviewRating(reviewRating, review.listing_review_id, ()=>{})
+ //      }
+ //    });
