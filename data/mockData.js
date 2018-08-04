@@ -41,10 +41,11 @@ db.connection.query(q, [], (err, results, fields) => {
     let reviews = [];
 
     for(var i = 2912000; i < (2912000 + sampleSize); i++) {
-      let reviewCount = Math.floor(Math.random()*9) + 5;//generate 5 - 100 reviews per listing
+      let reviewCount = Math.floor(Math.random()*95) + 5;//generate 5 - 100 reviews per listing
       for(var j = 0; j < reviewCount; j++) {
           reviews.push({'listing_review_id': i,
                         'user_id': Math.floor(Math.random()*sampleSize) + 1,
+                        'review_time': new Date(faker.date.recent()),
                         'review_content': faker.lorem.paragraph() + faker.lorem.paragraph()
                       });
       }
@@ -55,7 +56,6 @@ db.connection.query(q, [], (err, results, fields) => {
         let reviewRating = {
            review_id: results.insertId,
            rating_type_id: i + 1,
-           review_time: new Date(faker.date.recent()),
            star_ratings: Math.floor(Math.random() * 3) + 3
         };
         db.createReviewRating(reviewRating, review.listing_review_id, ()=>{})

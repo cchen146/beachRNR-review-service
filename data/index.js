@@ -76,7 +76,7 @@ connection.query(`
     listing_review_id BIGINT(8) UNSIGNED NOT NULL,
     rating_type_id INT(8) UNSIGNED NOT NULL,
     rating_review_count INT(8) UNSIGNED NOT NULL,
-    average_star_rating TINYINT UNSIGNED NOT NULL,
+    average_star_rating DOUBLE NOT NULL DEFAULT 0,
     PRIMARY KEY (id),
     FOREIGN KEY (listing_review_id) REFERENCES listing_review (id),
     FOREIGN KEY (rating_type_id) REFERENCES rating_type(id),
@@ -114,9 +114,11 @@ module.exports.updateListingReviewCount = (list_review_id, cb) => {
 module.exports.createReview = (review, cb) => {
   let q = 'INSERT INTO review SET ?';
   connection.query(q, review, (err, results, fields) => {
+      if(err) {cb(err, null, review)};
       if(results) {
+          cb(null, results, review);
           module.exports.updateListingReviewCount(review.listing_review_id, (err2, results2) => {
-             err? cb(err, null, review) : cb(null, results, review);
+
         });
       }
   })
@@ -152,7 +154,9 @@ module.exports.upsertListingAttrRating = (listing_review_id, rating_type_id, new
 
 module.exports.updateListingReviewAvRating = (list_review_id, newAvgRating, cb) => {
   let q = `UPDATE listing_review
-           SET average_rating = (average_rating * rating_count + ?) / (rating_count + 1), rating_count = rating_count + 1
+           SET
+             average_rating = (average_rating * rating_count + ?) / (rating_count + 1),
+             rating_count = rating_count + 1
            WHERE id = ?
           `;
   connection.query(q, [newAvgRating, list_review_id], (err, results, fields) => {
@@ -185,6 +189,38 @@ module.exports.createRatingType = (ratingTypes, cb) => {
     })
   }));
 };
+
+module.exports.readRatingNReviewCount = (listingId, cb) => {
+  let q = `SELECT review_count, ROUND(average_rating, 1) AS average_rating
+            FROM listing_review
+            WHERE id = ?`;
+  connection.query(q, [listingId], (err, results, fields) => {
+    err? cb(err, null) : cb(null, results);
+  });
+};
+
+module.exports.readReviewContent = (listingId, cb) => {
+  let q = `SELECT U.name AS username, U.avatar AS avatar, R.review_time AS review_time, R.review_content AS review_content
+          FROM beachrnr.review AS R
+          LEFT JOIN beachrnr.user AS U
+          ON R.user_id = U.id
+          WHERE listing_review_id = ?`;
+  connection.query(q, [listingId], (err, results, fields) => {
+    err? cb(err, null) : cb(null, results);
+  });
+};
+
+module.exports.readReviewRatings = (listingId, cb) => {
+  let q = `SELECT RT.name, ROUND(average_star_rating, 1) AS average_star_rating
+            FROM listing_attribute_rating AS LAR
+            LEFT JOIN rating_type AS RT
+            ON LAR.rating_type_id = RT.id
+            WHERE LAR.listing_review_id = ?
+            ORDER BY R.review_time DESC;`;
+  connection.query(q, [listingId], (err, results, fields) => {
+    err? cb(err, null) : cb(null, results);
+  });
+}
 
 
 module.exports.connection = connection;
