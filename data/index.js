@@ -115,9 +115,8 @@ module.exports.createReview = (review, cb) => {
   let q = 'INSERT INTO review SET ?';
   connection.query(q, review, (err, results, fields) => {
       if(results) {
-          err? cb(err, null, review) : cb(null, results, review);
-        module.exports.updateListingReviewCount(review.listing_review_id, (err2, results2) => {
-
+          module.exports.updateListingReviewCount(review.listing_review_id, (err2, results2) => {
+             err? cb(err, null, review) : cb(null, results, review);
         });
       }
   })
@@ -143,10 +142,10 @@ module.exports.upsertListingAttrRating = (listing_review_id, rating_type_id, new
         VALUES (?, ?, 1, ?)
         ON DUPLICATE KEY
         UPDATE
-          average_star_rating = (average_star_rating * rating_review_count + ${newRating}) / (rating_review_count + 1),
+          average_star_rating = (average_star_rating * rating_review_count + ?) / (rating_review_count + 1),
           rating_review_count = rating_review_count + 1
 `;
-  connection.query(q, [listing_review_id, rating_type_id, newRating], (err, results, fields) => {
+  connection.query(q, [listing_review_id, rating_type_id, newRating, newRating], (err, results, fields) => {
     err ? cb(err, null) : cb(null, results);
   });
 };

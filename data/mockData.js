@@ -55,6 +55,7 @@ db.connection.query(q, [], (err, results, fields) => {
         let reviewRating = {
            review_id: results.insertId,
            rating_type_id: i + 1,
+           review_time: new Date(faker.date.recent()),
            star_ratings: Math.floor(Math.random() * 3) + 3
         };
         db.createReviewRating(reviewRating, review.listing_review_id, ()=>{})
@@ -70,6 +71,7 @@ db.connection.query(q, [], (err, results, fields) => {
     for(var i = 0; i < sampleSize; i++) {
       reports.push({'user_id': i + 1,
                     'review_id': i + 1,
+                    'report_time': new Date(faker.date.recent()),
                     'report_content': reportOptions[Math.floor(Math.random()*3)]});
     };
 
@@ -79,26 +81,3 @@ db.connection.query(q, [], (err, results, fields) => {
 });
 
 
-
- // let reviews = [];
-
- //    for(var i = 2912000; i < 2912001; i++) {
-
- //      for(var j = 0; j < 1; j++) {
- //          reviews.push({'listing_review_id': i,
- //                        'user_id': 1,
- //                        'review_content': faker.lorem.paragraph() + faker.lorem.paragraph()
- //                      });
- //      }
- //    }
- //    db.createReviews(reviews, (err, results, review) => {
- //      // each review will be submitted with ratings for six rating type
- //      for(var i = 0; i < 6; i++) {
- //        let reviewRating = {
- //           review_id: results.insertId,
- //           rating_type_id: i + 1,
- //           star_ratings: 100
- //        };
- //        db.createReviewRating(reviewRating, review.listing_review_id, ()=>{})
- //      }
- //    });
