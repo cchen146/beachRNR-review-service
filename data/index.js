@@ -118,7 +118,6 @@ module.exports.createReview = (review, cb) => {
       if(results) {
           cb(null, results, review);
           module.exports.updateListingReviewCount(review.listing_review_id, (err2, results2) => {
-
         });
       }
   })
@@ -139,42 +138,30 @@ module.exports.createReviewReport = (reviewReps, cb) => {
   }));
 };
 
-module.exports.upsertListingAttrRating = (listing_review_id, rating_type_id, newRating, cb) => {
-  let q = `INSERT INTO listing_attribute_rating (listing_review_id, rating_type_id, rating_review_count, average_star_rating)
-        VALUES (?, ?, 1, ?)
-        ON DUPLICATE KEY
-        UPDATE
-          average_star_rating = (average_star_rating * rating_review_count + ?) / (rating_review_count + 1),
-          rating_review_count = rating_review_count + 1
-`;
-  connection.query(q, [listing_review_id, rating_type_id, newRating, newRating], (err, results, fields) => {
-    err ? cb(err, null) : cb(null, results);
-  });
-};
-
-module.exports.updateListingReviewAvRating = (list_review_id, newAvgRating, cb) => {
-  let q = `UPDATE listing_review
-           SET
-             average_rating = (average_rating * rating_count + ?) / (rating_count + 1),
-             rating_count = rating_count + 1
-           WHERE id = ?
-          `;
-  connection.query(q, [newAvgRating, list_review_id], (err, results, fields) => {
-    err ? cb(err, null) : cb(null, results);
-  });
-};
 
 module.exports.createReviewRating = (reviewRating, listing_review_id, cb) => {
-  let q = 'INSERT INTO review_rating SET ?';
-  connection.query(q, reviewRating, (err, results, fields) => {
-    if(results) {
-      module.exports.upsertListingAttrRating(listing_review_id, reviewRating.rating_type_id, reviewRating.star_ratings, (err2, results2) => {
-        if(results2) {
-          module.exports.updateListingReviewAvRating(listing_review_id, reviewRating.star_ratings, (err3, results3) => {})
-        }
-      });
-    }
-  });
+  let q = `INSERT INTO review_rating SET ?;
+          INSERT INTO listing_attribute_rating (listing_review_id, rating_type_id, rating_review_count, average_star_rating)
+          VALUES (${listing_review_id}, ${reviewRating.rating_type_id}, 1, ${reviewRating.star_ratings})
+          ON DUPLICATE KEY
+          UPDATE
+            average_star_rating = (average_star_rating * rating_review_count + ${reviewRating.star_ratings}) / (rating_review_count + 1),
+            rating_review_count = rating_review_count + 1;
+
+          UPDATE listing_review
+           SET
+             average_rating = (average_rating * rating_count +
+                                      (SELECT average_star_rating
+                                        FROM listing_attribute_rating
+                                        WHERE listing_review_id = ${listing_review_id}
+                                          AND rating_type_id = ${reviewRating.rating_type_id})
+                              ) / (rating_count + 1),
+             rating_count = rating_count + 1
+           WHERE id = ${listing_review_id};
+        `;
+  connection.query(q, [reviewRating], (err, results, fields) => {
+                        err ? cb(err, null) : cb(null, results);
+                  });
 };
 
 module.exports.createReviewRatings = (reviewRatings, listing_review_id, cb) => {
