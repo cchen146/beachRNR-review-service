@@ -27,17 +27,17 @@ app.get('/rooms/:id/reviews/content', (req, res) => {
   })
 });
 
-app.post('/rooms/:id/reviews/content', (req, res) => {
+// app.post('/rooms/:id/reviews/content', (req, res) => {
 
-});
+// });
 
-app.put('/rooms/:id/reviews/content', (req, res) => {
+// app.put('/rooms/:id/reviews/content', (req, res) => {
 
-});
+// });
 
-app.delete('/rooms/:id/reviews/content', (req, res) => {
+// app.delete('/rooms/:id/reviews/content', (req, res) => {
 
-});
+// });
 
 app.get('/*', (req, res) => {
   res.send('hello world!');
