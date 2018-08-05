@@ -187,11 +187,12 @@ module.exports.readRatingNReviewCount = (listingId, cb) => {
 };
 
 module.exports.readReviewContent = (listingId, cb) => {
-  let q = `SELECT U.name AS username, U.avatar AS avatar, R.review_time AS review_time, R.review_content AS review_content
+  let q = `SELECT U.name AS user_name, U.avatar AS user_avatar, R.id AS review_id, R.review_time AS review_time, R.review_content AS review_content
           FROM beachrnr.review AS R
           LEFT JOIN beachrnr.user AS U
           ON R.user_id = U.id
-          WHERE listing_review_id = ?`;
+          WHERE listing_review_id = ?
+          ORDER BY R.review_time DESC`;
   connection.query(q, [listingId], (err, results, fields) => {
     err? cb(err, null) : cb(null, results);
   });
@@ -203,7 +204,7 @@ module.exports.readReviewRatings = (listingId, cb) => {
             LEFT JOIN rating_type AS RT
             ON LAR.rating_type_id = RT.id
             WHERE LAR.listing_review_id = ?
-            ORDER BY R.review_time DESC;`;
+            ORDER BY RT.id`;
   connection.query(q, [listingId], (err, results, fields) => {
     err? cb(err, null) : cb(null, results);
   });
