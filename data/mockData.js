@@ -58,7 +58,6 @@ db.connection.query(q, [], (err, results, fields) => {
            rating_type_id: i + 1,
            star_ratings: Math.floor(Math.random() * 3) + 3
         };
-        console.log(results.insertId);
         db.createReviewRating(reviewRating, review.listing_review_id, ()=>{})
       }
     });

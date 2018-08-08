@@ -7,7 +7,6 @@ const db = require('../data/index.js');
 app.get('/rooms/:id/reviews/ratings', (req, res) => {
   let listingId = req.params.id;
   db.readReviewRatings(listingId,(err, results) => {
-    console.log(results);
     res.send(results);
   })
 });
