@@ -1,2 +1,5 @@
 node_modules/
 *.log
+
+# database config file
+config.js

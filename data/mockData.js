@@ -1,13 +1,84 @@
-var reviews = [{"user_id":14338,"user_name":"Darron Olson","review_id":89566,"user_avatar":"https://s3.amazonaws.com/uifaces/faces/twitter/dmackerman/128.jpg","review_date":"2017-12-26T05:42:17.080Z","review_content":"Quos perspiciatis unde veritatis inventore nobis. Id officia eveniet labore. Nobis et possimus nihil aut. Et possimus aliquid debitis voluptas laborum delectus animi repellat assumenda. Voluptatibus reprehenderit neque."}, {"user_id":93995,"user_name":"Aniyah Rodriguez","review_id":20797,"user_avatar":"https://s3.amazonaws.com/uifaces/faces/twitter/iamkeithmason/128.jpg","review_date":"2018-04-26T05:34:16.950Z","review_content":"Quia ut pariatur voluptas quaerat eveniet aspernatur in et velit. Voluptatem quisquam est nihil occaecati a. Qui dolorem omnis in vel quia ullam sapiente numquam. Blanditiis labore nulla vel illum possimus. Modi quidem inventore sunt. Et praesentiumitaque distinctio iusto atque qui quae pariatur."},
-{"user_id":27385,"user_name":"Mr. Miguel Braun","review_id":16739,"user_avatar":"https://s3.amazonaws.com/uifaces/faces/twitter/bartjo/128.jpg","review_date":"2018-01-07T20:46:02.814Z","review_content":"Ut blanditiis culpa voluptates molestiae eius ipsa rerum sit. Nesciunt nihil ducimus molestias itaque inventore debitis qui. Officia modi voluptatem eos sint aut aperiam voluptas. Ducimus quam occaecati qui excepturi recusandae id asperiores odit. Natus nemo tempore molestias iure autem. Rerum ipsum sint et eius blanditiis corrupti fugiat."},
-{"user_id":39970,"user_name":"Dr. Jakayla Jast","review_id":48358,"user_avatar":"https://s3.amazonaws.com/uifaces/faces/twitter/lebinoclard/128.jpg","review_date":"2017-12-01T18:01:33.992Z","review_content":"Atque aspernatur et delectus blanditiis autem laborum ipsum placeat. Sed sit voluptas est dolorum incidunt iusto. Est adipisci ullam rem. Aut facere ipsam. Ducimus explicabo beatae dolore repudiandae dolores voluptatem aut. Magni rem porro."},
-{"user_id":90139,"user_name":"Mack Tromp","review_id":50957,"user_avatar":"https://s3.amazonaws.com/uifaces/faces/twitter/katiemdaly/128.jpg","review_date":"2018-05-20T23:31:42.654Z","review_content":"Eveniet error optio omnis illo eligendi id repudiandae quidem blanditiis. Quia ut vel asperiores et. Dolorem dolor quaerat voluptates in eos nesciunt illum."},
-{"user_id":58133,"user_name":"Danial Murray","review_id":71378,"user_avatar":"https://s3.amazonaws.com/uifaces/faces/twitter/jffgrdnr/128.jpg","review_date":"2017-07-22T13:29:36.797Z","review_content":"Quis exercitationem animi inventore corrupti dicta repellat quos eos omnis. Est eum quod blanditiis et amet quisquam mollitia. Quos similique qui. Consequuntur amet iste recusandae labore nobis. Autem reiciendis atque vel dolorem. Minima vel asperiores architecto officia dolores magni ad amet."},
-{"user_id":9669,"user_name":"Tara Hermiston","review_id":58096,"user_avatar":"https://s3.amazonaws.com/uifaces/faces/twitter/supervova/128.jpg","review_date":"2017-10-19T06:38:52.255Z","review_content":"Omnis eum consequatur eos explicabo nam aperiam officia delectus. Aut iste at error aut. Autem dolores dignissimos quia et. Et numquam molestias sed. Quam quia aspernatur sint quo architecto ad quidem. Qui maxime totam quia eligendi inventore est error rerum et."},
-{"user_id":98653,"user_name":"Kiel Krajcik Jr.","review_id":65628,"user_avatar":"https://s3.amazonaws.com/uifaces/faces/twitter/mbilderbach/128.jpg","review_date":"2018-02-15T22:54:27.949Z","review_content":"Fugit blanditiis a utreiciendis assumenda. Provident velit est consequuntur libero sint reiciendis tempore. Nulla qui incidunt quaerat ratione aperiam. Nulla nam fugiat exercitationem corporis aspernatur architecto velit. Facere suscipit tenetur isteid natus blanditiis blanditiis vero."},
-{"user_id":5728,"user_name":"Mrs. Claire Emard","review_id":6741,"user_avatar":"https://s3.amazonaws.com/uifaces/faces/twitter/joshhemsley/128.jpg","review_date":"2018-04-02T18:14:21.896Z","review_content":"Numquam et quae. Corrupti alias quo iusto culpa sit omnis atque cum quia. Sint illo doloremque fuga neque aspernatur repudiandae explicabo est. Nihil eos dolore deserunt nesciunt nobis. Suscipit aut quidem ut harum deleniti error veniam. Autem similique consectetur tempora excepturi et sit ut."},
-{"user_id":62733,"user_name":"Eli Hermann","review_id":23793,"user_avatar":"https://s3.amazonaws.com/uifaces/faces/twitter/charliegann/128.jpg","review_date":"2017-09-26T08:58:23.402Z","review_content":"Nesciunt et placeat accusantium quam nihil dolorum libero dignissimos est. Perspiciatis placeat quia saepe. Dolores voluptates quos optio estet dolores cumque et."},
-{"user_id":4598,"user_name":"Ms. Lou Beahan","review_id":4111,"user_avatar":"https://s3.amazonaws.com/uifaces/faces/twitter/mutlu82/128.jpg","review_date":"2018-06-09T22:47:13.169Z","review_content":"Neque placeat ut odio rerum fuga ut animi. Et asperiores omnis. Debitis molestias modi voluptates quibusdam. Sit rerum sint aperiam dolorem aut magnam tenetur maxime eaque. Ea sed eaque. Nobis molestiae quo modi consequatur optio natus."}
-];
+const db = require('./index.js');
+const faker = require('faker');
+const sampleSize = 100;
 
-var listingRatings = {"Accuracy":4,"Location":3,"Communication":4,"Check-in":3,"Cleanliness":4,"Value":5};
+
+let q = `SELECT COUNT (id) AS count FROM listing_review`;
+
+db.connection.query(q, [], (err, results, fields) => {
+  // check if this is first time set up
+  if(results[0].count === 0) {
+    // create 100 mock users
+    let users = [];
+
+    for(var i = 0; i < sampleSize; i++) {
+      users.push({'name': faker.name.findName(), 'avatar': faker.image.avatar()});
+    }
+
+    db.createUser(users,(err, results) => {});
+
+
+    // load 6 rating type to static table rating_type
+    let ratingTypes = ['Accuracy', 'Location', 'Communication', 'Checkin', 'Cleanliness', 'Value'];
+    let results = [];
+    ratingTypes.forEach(ratingType => {
+      results.push({'name': ratingType});
+    });
+
+    db.createRatingType(results, (err, results) => {if(err){console.log(err)}});
+
+    // create 100 listings
+    let listings = [];
+
+    for(var i = 0; i < sampleSize; i++) {
+      listings.push({'review_count': 0, 'average_rating': 0});
+    }
+
+    db.createListing(listings,(err, results) => {});
+
+    // create 100 reviews; (update reivew count)
+    // /////////update ratings for review, listing_attribute_rating, listing_review
+    let reviews = [];
+
+    for(var i = 2912000; i < (2912000 + sampleSize); i++) {
+      let reviewCount = Math.floor(Math.random()*95) + 5;//generate 5 - 100 reviews per listing
+      for(var j = 0; j < reviewCount; j++) {
+          reviews.push({'listing_review_id': i,
+                        'user_id': Math.floor(Math.random()*sampleSize) + 1,
+                        'review_time': new Date(faker.date.recent()),
+                        'review_content': faker.lorem.paragraph() + faker.lorem.paragraph()
+                      });
+      }
+    }
+    db.createReviews(reviews, (err, results, review) => {
+      // each review will be submitted with ratings for six rating type
+      for(var i = 0; i < ratingTypes.length; i++) {
+        let reviewRating = {
+           review_id: results.insertId,
+           rating_type_id: i + 1,
+           star_ratings: Math.floor(Math.random() * 3) + 3
+        };
+        console.log(results.insertId);
+        db.createReviewRating(reviewRating, review.listing_review_id, ()=>{})
+      }
+    });
+
+    // generate 100 mock review-reports
+    let reportOptions = [`This review contains violent, graphic, promotional, or otherwise offensive content.`,
+                        `This review is purposefully malicious and assaulting.`,
+                        `This review contains false information or may be fake.`
+                        ];
+    let reports = [];
+    for(var i = 0; i < sampleSize; i++) {
+      reports.push({'user_id': i + 1,
+                    'review_id': i + 1,
+                    'report_time': new Date(faker.date.recent()),
+                    'report_content': reportOptions[Math.floor(Math.random()*3)]});
+    };
+
+    db.createReviewReport(reports,(err, results) => {if(err){console.log(err)}});
+
+  }
+});
+
+
