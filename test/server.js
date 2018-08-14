@@ -2,7 +2,6 @@ const assert = require('assert');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const should = chai.should();
-const dbkeys = require('../config.js');
 
 chai.use(chaiHttp);
 process.env.NODE_ENV = 'test';
