@@ -13,12 +13,11 @@ describe('TESTING API GET REQUEST', () => {
 
 	var app; 
 	before((done) => { //Before each test we empty the database
-		db.connection.query(`DROP DATABASE IF EXISTS ${dbkeys.databaseTesting || 'beachrnrtesting'}`, 
-			(err, res, fields) => {
-				db.setupDatabase();
-				app = require('../server/index.js');
-				done();
-			})
+		db.dropTestingDatabase((err, res, fields) => {
+			db.setupDatabase();
+			app = require('../server/index.js');
+			done();
+		});
 	});
 
 	after((done) => {

@@ -8,15 +8,14 @@ const connection = mysql.createConnection({
   multipleStatements: true
 });
 
+let currentDB = `${process.env.NODE_ENV === 'test' 
+                ? dbkeys.databaseTesting || 'beachrnrtesting'
+                : dbkeys.database || 'beachrnr'}`;
 
 let query = `
-  CREATE DATABASE IF NOT EXISTS ${process.env.NODE_ENV === 'test' 
-                                  ? dbkeys.databaseTesting || 'beachrnrtesting'
-                                  : dbkeys.database || 'beachrnr'};
+  CREATE DATABASE IF NOT EXISTS ${currentDB};
 
-  USE ${process.env.NODE_ENV === 'test' 
-      ? dbkeys.databaseTesting || 'beachrnrtesting'
-      : dbkeys.database || 'beachrnr'};
+  USE ${currentDB};
 
   CREATE TABLE IF NOT EXISTS user(
     id BIGINT(8) UNSIGNED AUTO_INCREMENT,
@@ -94,6 +93,13 @@ module.exports.setupDatabase = () => {
 
 
 module.exports.setupDatabase();
+
+module.exports.dropTestingDatabase = (cb) => {
+  let q = `DROP DATABASE IF EXISTS ${dbkeys.databaseTesting || 'beachrnrtesting'}`;
+  connection.query(query, [], (err, results, fields) => {
+    err ? cb(err, null) : cb(null, results);
+  });
+}
 
 module.exports.createUser = (users, cb) => {
   let q = 'INSERT INTO user SET ?';
