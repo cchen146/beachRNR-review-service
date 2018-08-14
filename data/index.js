@@ -1,16 +1,18 @@
 const mysql  = require('mysql');
-const dbkeys = require('../config.js');
+let host = process.env.MYSQL_HOST || require('../config.js').host;
+let user = process.env.MYSQL_USER || require('../config.js').user;
+let password = process.env.MYSQL_PASSWORD || require('../config.js').password;
 
 const connection = mysql.createConnection({
-  host     : process.env.MYSQL_HOST || dbkeys.host,
-  user     : process.env.MYSQL_USER || dbkeys.user,
-  password : process.env.MYSQL_PASSWORD || dbkeys.password,
+  host     : host,
+  user     : user,
+  password : password,
   multipleStatements: true
 });
 
 let currentDB = `${process.env.NODE_ENV === 'test' 
-                ? dbkeys.databaseTesting || 'beachrnrtesting'
-                : dbkeys.database || 'beachrnr'}`;
+                ? 'beachrnrtesting'
+                : 'beachrnr'}`;
 
 let query = `
   CREATE DATABASE IF NOT EXISTS ${currentDB};
@@ -95,7 +97,7 @@ module.exports.setupDatabase = () => {
 module.exports.setupDatabase();
 
 module.exports.dropTestingDatabase = (cb) => {
-  let q = `DROP DATABASE IF EXISTS ${dbkeys.databaseTesting || 'beachrnrtesting'}`;
+  let q = `DROP DATABASE IF EXISTS beachrnrtesting`;
   connection.query(query, [], (err, results, fields) => {
     err ? cb(err, null) : cb(null, results);
   });
