@@ -1,7 +1,7 @@
-var mysql  = require('mysql');
-var dbkeys = require('../config.js');
+const mysql  = require('mysql');
+const dbkeys = require('../config.js');
 
-var connection = mysql.createConnection({
+const connection = mysql.createConnection({
   host     : process.env.MYSQL_HOST || dbkeys.host,
   user     : process.env.MYSQL_USER || dbkeys.user,
   password : process.env.MYSQL_PASSWORD || dbkeys.password,
@@ -9,10 +9,14 @@ var connection = mysql.createConnection({
 });
 
 
-connection.query(`
-  CREATE DATABASE IF NOT EXISTS beachrnr;
+let query = `
+  CREATE DATABASE IF NOT EXISTS ${process.env.NODE_ENV === 'test' 
+                                  ? dbkeys.databaseTesting || 'beachrnrtesting'
+                                  : dbkeys.database || 'beachrnr'};
 
-  USE beachrnr;
+  USE ${process.env.NODE_ENV === 'test' 
+      ? dbkeys.databaseTesting || 'beachrnrtesting'
+      : dbkeys.database || 'beachrnr'};
 
   CREATE TABLE IF NOT EXISTS user(
     id BIGINT(8) UNSIGNED AUTO_INCREMENT,
@@ -82,9 +86,14 @@ connection.query(`
     FOREIGN KEY (rating_type_id) REFERENCES rating_type(id),
     CONSTRAINT unique_attr_rating UNIQUE (listing_review_id, rating_type_id)
   );
+`
 
-`);
+module.exports.setupDatabase = () => {
+  connection.query(query);
+};
 
+
+module.exports.setupDatabase();
 
 module.exports.createUser = (users, cb) => {
   let q = 'INSERT INTO user SET ?';
@@ -178,21 +187,25 @@ module.exports.createRatingType = (ratingTypes, cb) => {
 };
 
 module.exports.readRatingNReviewCount = (listingId, cb) => {
+
   let q = `SELECT review_count, ROUND(average_rating, 1) AS average_rating
             FROM listing_review
             WHERE id = ?`;
+
   connection.query(q, [listingId], (err, results, fields) => {
+
     err? cb(err, null) : cb(null, results);
   });
 };
 
 module.exports.readReviewContent = (listingId, cb) => {
   let q = `SELECT U.name AS user_name, U.avatar AS user_avatar, R.id AS review_id, R.review_time AS review_time, R.review_content AS review_content
-          FROM beachrnr.review AS R
-          LEFT JOIN beachrnr.user AS U
+          FROM review AS R
+          LEFT JOIN user AS U
           ON R.user_id = U.id
           WHERE listing_review_id = ?
           ORDER BY R.review_time DESC`;
+
   connection.query(q, [listingId], (err, results, fields) => {
     err? cb(err, null) : cb(null, results);
   });

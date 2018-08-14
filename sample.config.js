@@ -3,5 +3,6 @@ module.exports = {
   'host':'localhost',
   'user': 'root',
   'password': '',
-  'database': 'beachrnr'
+  'database': 'beachrnr',
+  'databaseTesting': 'beachrnr-testing'
 }

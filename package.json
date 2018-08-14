@@ -4,8 +4,8 @@
   "description": "",
   "main": "server/index.js",
   "scripts": {
-    "server-dev": "nodemon server/index.js",
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "server-dev": "set NODE_ENV = development && nodemon server/index.js",
+    "test": "mocha test/server.js --timeout 5000 --exit"
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,10 @@
     "faker": "^4.1.0",
     "mysql": "^2.16.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "mocha": "^5.2.0",
+    "sinon": "^6.1.5"
+  }
 }
