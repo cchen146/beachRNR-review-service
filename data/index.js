@@ -1,7 +1,7 @@
 const mysql  = require('mysql');
-let host = process.env.MYSQL_HOST || require('../config.js').host;
-let user = process.env.MYSQL_USER || require('../config.js').user;
-let password = process.env.MYSQL_PASSWORD || require('../config.js').password;
+let host = process.env.MYSQL_HOST;
+let user = process.env.MYSQL_USER;
+let password = process.env.MYSQL_PASSWORD;
 
 const connection = mysql.createConnection({
   host     : host,
