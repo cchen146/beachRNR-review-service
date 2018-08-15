@@ -1,4 +1,8 @@
 const mysql  = require('mysql');
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').load();
+};
+
 let host = process.env.MYSQL_HOST;
 let user = process.env.MYSQL_USER;
 let password = process.env.MYSQL_PASSWORD;
