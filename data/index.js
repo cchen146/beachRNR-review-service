@@ -1,11 +1,13 @@
 const mysql  = require('mysql');
+
+
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').load();
 };
 
 let host = process.env.MYSQL_HOST;
 let user = process.env.MYSQL_USER;
-let password = process.env.MYSQL_PASSWORD;
+let password = process.env.MYSQL_PASSWORD || '';
 
 const connection = mysql.createConnection({
   host     : host,
@@ -14,9 +16,11 @@ const connection = mysql.createConnection({
   multipleStatements: true
 });
 
+
 let currentDB = `${process.env.NODE_ENV === 'test' 
                 ? 'beachrnrtesting'
                 : 'beachrnr'}`;
+
 
 let query = `
   CREATE DATABASE IF NOT EXISTS ${currentDB};
@@ -94,7 +98,7 @@ let query = `
 `
 
 module.exports.setupDatabase = () => {
-  connection.query(query);
+  connection.query(query)
 };
 
 

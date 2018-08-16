@@ -3,11 +3,12 @@ const faker = require('faker');
 const sampleSize = 100;
 
 
-let q = `SELECT COUNT (id) AS count FROM listing_review`;
+let q = `SELECT 1 FROM listing_review LIMIT 1`;
 
 db.connection.query(q, [], (err, results, fields) => {
   // check if this is first time set up
-  if(results[0].count === 0) {
+
+  if(results.length === 0) {
     // create 100 mock users
     let users = [];
 
