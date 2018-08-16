@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const mockData = require('../data/mockData.js');
+if(process.env.NODE_ENV === 'production') {const mockData = require('../data/mockData.js')};
 const db = require('../data/index.js');
 
 
@@ -27,20 +27,8 @@ app.get('/rooms/:id/reviews/content', (req, res) => {
   })
 });
 
-// app.post('/rooms/:id/reviews/content', (req, res) => {
-
-// });
-
-// app.put('/rooms/:id/reviews/content', (req, res) => {
-
-// });
-
-// app.delete('/rooms/:id/reviews/content', (req, res) => {
-
-// });
-
-app.get('/*', (req, res) => {
-  res.send('hello world!');
+app.get('/rooms/:id/reviews/*', (req, res) => {
+  res.status(404).end();
 });
 
 var server = app.listen('3003', ()=>{console.log('listening to port 3003!')});

@@ -6,14 +6,13 @@ const sinon = require('sinon');
 const assert = require('assert');
 chai.use(chaiHttp);
 
-describe('Test server REST API', () => {
+xdescribe('Test server REST API', () => {
 
-	describe('/rooms/:id/reviews/ratings', () => {
+	xdescribe('/rooms/:id/reviews/ratings', () => {
 		var cb;
 
 		before(() => {
 			cb = sinon.fake();
-			console.log('cb >>>' + cb);
 			app.ratingsHandler.get(cb);
 			app.runServer();
 		})
@@ -23,7 +22,7 @@ describe('Test server REST API', () => {
 			app.server.close();
 		});
 
-		it('cb is called once', (done) => {
+		xit('cb is called once', (done) => {
 			chai.request(app.app)
 		        .get('/rooms/2912000/reviews/ratings')
 		        .end((err, res) => {

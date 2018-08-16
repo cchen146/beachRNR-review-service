@@ -17,7 +17,7 @@ const connection = mysql.createConnection({
 });
 
 
-let currentDB = `${process.env.NODE_ENV === 'test' 
+let currentDB = `${process.env.NODE_ENV === 'test'
                 ? 'beachrnrtesting'
                 : 'beachrnr'}`;
 
@@ -106,7 +106,7 @@ module.exports.setupDatabase();
 
 module.exports.dropTestingDatabase = (cb) => {
   let q = `DROP DATABASE IF EXISTS beachrnrtesting`;
-  connection.query(query, [], (err, results, fields) => {
+  connection.query(q, [], (err, results, fields) => {
     err ? cb(err, null) : cb(null, results);
   });
 }
