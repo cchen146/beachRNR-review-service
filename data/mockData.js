@@ -2,7 +2,6 @@ const db = require('./index.js');
 const faker = require('faker');
 const sampleSize = 100;
 
-
 let q = `SELECT 1 FROM listing_review LIMIT 1`;
 
 db.connection.query(q, [], (err, results, fields) => {

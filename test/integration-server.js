@@ -10,9 +10,9 @@ const db = require('../data/index.js');
 
 describe('TESTING API GET REQUEST', () => {
 
-	var app; 
+	var app;
 	before((done) => { //Before each test we empty the database
-		db.dropTestingDatabase((err, res, fields) => {
+		db.dropTestingDatabase((err, res) => {
 			db.setupDatabase();
 			app = require('../server/index.js');
 			done();
