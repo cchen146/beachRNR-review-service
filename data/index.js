@@ -1,18 +1,31 @@
-var mysql  = require('mysql');
-var dbkeys = require('../config.js');
+const mysql  = require('mysql');
 
-var connection = mysql.createConnection({
-  host     : process.env.MYSQL_HOST || dbkeys.host,
-  user     : process.env.MYSQL_USER || dbkeys.user,
-  password : process.env.MYSQL_PASSWORD || dbkeys.password,
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').load();
+};
+
+let host = process.env.MYSQL_HOST;
+let user = process.env.MYSQL_USER;
+let password = process.env.MYSQL_PASSWORD || '';
+
+const connection = mysql.createConnection({
+  host     : host,
+  user     : user,
+  password : password,
   multipleStatements: true
 });
 
 
-connection.query(`
-  CREATE DATABASE IF NOT EXISTS beachrnr;
+let currentDB = `${process.env.NODE_ENV === 'test' 
+                ? 'beachrnrtesting'
+                : 'beachrnr'}`;
 
-  USE beachrnr;
+
+let query = `
+  CREATE DATABASE IF NOT EXISTS ${currentDB};
+
+  USE ${currentDB};
 
   CREATE TABLE IF NOT EXISTS user(
     id BIGINT(8) UNSIGNED AUTO_INCREMENT,
@@ -82,9 +95,21 @@ connection.query(`
     FOREIGN KEY (rating_type_id) REFERENCES rating_type(id),
     CONSTRAINT unique_attr_rating UNIQUE (listing_review_id, rating_type_id)
   );
+`
 
-`);
+module.exports.setupDatabase = () => {
+  connection.query(query)
+};
 
+
+module.exports.setupDatabase();
+
+module.exports.dropTestingDatabase = (cb) => {
+  let q = `DROP DATABASE IF EXISTS beachrnrtesting`;
+  connection.query(query, [], (err, results, fields) => {
+    err ? cb(err, null) : cb(null, results);
+  });
+}
 
 module.exports.createUser = (users, cb) => {
   let q = 'INSERT INTO user SET ?';
@@ -178,21 +203,25 @@ module.exports.createRatingType = (ratingTypes, cb) => {
 };
 
 module.exports.readRatingNReviewCount = (listingId, cb) => {
+
   let q = `SELECT review_count, ROUND(average_rating, 1) AS average_rating
             FROM listing_review
             WHERE id = ?`;
+
   connection.query(q, [listingId], (err, results, fields) => {
+
     err? cb(err, null) : cb(null, results);
   });
 };
 
 module.exports.readReviewContent = (listingId, cb) => {
   let q = `SELECT U.name AS user_name, U.avatar AS user_avatar, R.id AS review_id, R.review_time AS review_time, R.review_content AS review_content
-          FROM beachrnr.review AS R
-          LEFT JOIN beachrnr.user AS U
+          FROM review AS R
+          LEFT JOIN user AS U
           ON R.user_id = U.id
           WHERE listing_review_id = ?
           ORDER BY R.review_time DESC`;
+
   connection.query(q, [listingId], (err, results, fields) => {
     err? cb(err, null) : cb(null, results);
   });

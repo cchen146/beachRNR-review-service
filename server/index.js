@@ -7,7 +7,6 @@ const db = require('../data/index.js');
 app.get('/rooms/:id/reviews/ratings', (req, res) => {
   let listingId = req.params.id;
   db.readReviewRatings(listingId,(err, results) => {
-    console.log(results);
     res.send(results);
   })
 });
@@ -44,4 +43,11 @@ app.get('/*', (req, res) => {
   res.send('hello world!');
 });
 
-app.listen('3003', ()=>{console.log('listening to port 3003!')});
+var server = app.listen('3003', ()=>{console.log('listening to port 3003!')});
+
+
+module.exports.app = app;
+module.exports.server = server;
+
+
+

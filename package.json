@@ -4,7 +4,7 @@
   "description": "",
   "main": "server/index.js",
   "scripts": {
-    "server-dev": "nodemon server/index.js",
+    "server-dev": "set NODE_ENV=development && node server/index.js",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
   "repository": {
@@ -18,5 +18,14 @@
     "faker": "^4.1.0",
     "mysql": "^2.16.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "dotenv": "^6.0.0",
+    "fs": "0.0.1-security",
+    "gulp": "^3.9.1",
+    "mocha": "^5.2.0",
+    "sinon": "^6.1.5",
+    "travis": "^0.1.1"
+  }
 }
