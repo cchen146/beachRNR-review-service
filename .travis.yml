@@ -12,3 +12,6 @@ addons:
       - mysql-server
       - mysql-client
 
+cache:
+  directories:
+    - node_modules
