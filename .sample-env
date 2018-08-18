@@ -1,4 +1,3 @@
-MYSQL_HOST = 'ec2-54-153-78-64.us-west-1.compute.amazonaws.com'
-MYSQL_USER = 'remote_user'
-MYSQL_PASSWORD = 'mypassword'
-MYSQL_PORT = '3306'
+MYSQL_HOST = 'localhost'
+MYSQL_USER = 'root'
+MYSQL_PASSWORD = ''

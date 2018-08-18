@@ -1,9 +1,9 @@
 const mysql  = require('mysql');
 
-console.log('data index.js process.env.NODE_ENV >>>' + process.env.NODE_ENV);
-// if (process.env.NODE_ENV !== 'production') {
+
+if (process.env.NODE_ENV !== 'production') {
   require('dotenv').load();
-// };
+};
 
 let host = process.env.MYSQL_HOST;
 let user = process.env.MYSQL_USER;
