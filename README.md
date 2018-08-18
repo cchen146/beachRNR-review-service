@@ -13,12 +13,14 @@
 
 ## Usage
 
-> Some usage instructions
+1. npm install
+2. Make a copy of .sample-env file and save as '.env' in the same directory
+3. Change the environment variable (env var) in your .env file, if your MYSQL_PASSWORD is empty string, please delete this env var from the .env
 
 ## Requirements
 
 - Node 0.10.x
-- MYSQL
+- MYSQL 5.7
 
 ## Development
 
