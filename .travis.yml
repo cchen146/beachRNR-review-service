@@ -22,8 +22,8 @@ deploy:
   bucket: yourBucketNameHERE
   key: latest.zip
   bundle_type: zip
-  application: beacnrnr-review-service
-  deployment_group: beacnrnr-review-service
+  application: beachrnr-review-service
+  deployment_group: beachrnr-review-service
   region: us-west-1
   on: *1
 script:
