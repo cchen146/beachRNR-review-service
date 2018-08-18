@@ -19,7 +19,7 @@ deploy:
 - provider: codedeploy
   access_key_id: "$AWS_ACCESS_KEY"
   secret_access_key: "$AWS_SECRET_KEY"
-  bucket: yourBucketNameHERE
+  bucket: beachrnrreviewservice
   key: latest.zip
   bundle_type: zip
   application: beachrnr-review-service
