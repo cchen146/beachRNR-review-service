@@ -1,7 +1,11 @@
 const express = require('express');
 const app = express();
-if(process.env.NODE_ENV === 'production') {const mockData = require('../data/mockData.js')};
 const db = require('../data/index.js');
+
+if(process.env.NODE_ENV == 'production') {
+  const mockData = require('../data/mockData.js')
+};
+
 
 
 app.get('/rooms/:id/reviews/ratings', (req, res) => {

@@ -4,7 +4,7 @@
   "description": "",
   "main": "server/index.js",
   "scripts": {
-    "server-dev": "set NODE_ENV=development && node server/index.js",
+    "start": "set NODE_ENV=development&& node server/index.js",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
   "repository": {
