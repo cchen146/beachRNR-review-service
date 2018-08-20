@@ -1,3 +1,3 @@
-npm run server-dev
+pm2 start process.yml --env production
 
-echo 'run server-dev script'
+echo 'start the app'

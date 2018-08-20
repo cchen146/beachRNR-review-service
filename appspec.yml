@@ -7,9 +7,9 @@ files:
     destination: /home/ubuntu/beachrnr-review-service
 
 hooks:
-  # BeforeInstall:
-  #   - location: scripts/before_install.sh
-  #     runas: ubuntu
+  BeforeInstall:
+    - location: scripts/before_install.sh
+      runas: ubuntu
   AfterInstall:
     - location: scripts/after_install.sh
       runas: ubuntu
