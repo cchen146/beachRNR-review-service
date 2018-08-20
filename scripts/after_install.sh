@@ -1,4 +1,4 @@
-cd /beachrnr-review-service
+cd beachrnr-review-service
 
 sudo npm install
 
