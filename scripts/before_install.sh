@@ -4,4 +4,5 @@ sudo pm2 update
 
 sudo pm2 stop all
 
-sudo rm -R beachrnr-review-service/*
+sudo rm -R -rf beachrnr-review-service/*
+
