@@ -4,7 +4,7 @@ os: linux
 
 files:
   - source: /
-    destination: /beachrnr-review-service
+    destination: /home/ubuntu/beachrnr-review-service
 
 hooks:
   BeforeInstall:
