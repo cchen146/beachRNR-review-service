@@ -3,17 +3,17 @@ version: 0.0
 os: linux
 
 files:
-  - source: ./
+  - source: /
     destination: /home/ubuntu/beachrnr-review-service
 
 hooks:
   BeforeInstall:
     - location: scripts/before_install.sh
-      runas: root
+      runas: ubuntu
   AfterInstall:
     - location: scripts/after_install.sh
-      runas: root
+      runas: ubuntu
 
   ApplicationStart:
     - location: scripts/start_server.sh
-      runas: root
+      runas: ubuntu
