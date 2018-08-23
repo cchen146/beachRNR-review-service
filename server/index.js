@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const db = require('../data/index.js');
 
-if(process.env.NODE_ENV == 'production') {
+if(process.env.NODE_ENV === 'production') {
   const mockData = require('../data/mockData.js')
 };
 
@@ -35,7 +35,7 @@ app.get('/rooms/:id/reviews/*', (req, res) => {
   res.status(404).end();
 });
 
-var server = app.listen('3003', ()=>{console.log('listening to port 3003!')});
+var server = app.listen('80', ()=>{console.log('listening to port 80!')});
 
 
 module.exports.app = app;
