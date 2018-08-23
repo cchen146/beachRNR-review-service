@@ -35,7 +35,7 @@ app.get('/rooms/:id/reviews/*', (req, res) => {
   res.status(404).end();
 });
 
-var server = app.listen('80', ()=>{console.log('listening to port 80!')});
+var server = app.listen('3003', ()=>{console.log('listening to port 3003!')});
 
 
 module.exports.app = app;
