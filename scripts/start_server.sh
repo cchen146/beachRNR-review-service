@@ -1,3 +1,3 @@
-sudo pm2 start ../process.yml --env production
+sudo pm2 start server/index.js
 
 echo 'start the app'
