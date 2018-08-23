@@ -1,5 +1,5 @@
 apps:
-  - script   : server/index.js
+  - script   : /home/ubuntu/beachrnr-review-service/server/index.js
     name     : 'beachrnr-review-service'
     env    :
       NODE_ENV: development
