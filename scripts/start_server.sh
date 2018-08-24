@@ -1,4 +1,4 @@
-cd beachrnr-review-service
+cd /home/ubuntu/beachrnr-review-service
 
 sudo pm2 start server/index.js
 
