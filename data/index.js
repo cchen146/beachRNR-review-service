@@ -54,7 +54,7 @@ let query = `
   ALTER TABLE listing_review AUTO_INCREMENT = 2912000;
 
   CREATE TABLE IF NOT EXISTS review(
-    id BIGINT(8) UNSIGNED AUTO_INCREMENT,
+    id BIGINT(8) UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id BIGINT(8) UNSIGNED NOT NULL,
     listing_review_id BIGINT(8) UNSIGNED NOT NULL,
     review_content VARCHAR(1000) NOT NULL,
@@ -63,6 +63,7 @@ let query = `
     FOREIGN KEY (user_id) REFERENCES user(id),
     FOREIGN KEY (listing_review_id) REFERENCES listing_review (id)
   );
+
 
   CREATE TABLE IF NOT EXISTS review_report(
     id BIGINT(8) UNSIGNED AUTO_INCREMENT,
@@ -93,6 +94,7 @@ let query = `
     CONSTRAINT unique_review_rating_type UNIQUE (review_id, rating_type_id)
   );
 
+
   CREATE TABLE IF NOT EXISTS listing_attribute_rating(
     id BIGINT(8) UNSIGNED AUTO_INCREMENT,
     listing_review_id BIGINT(8) UNSIGNED NOT NULL,
@@ -104,6 +106,7 @@ let query = `
     FOREIGN KEY (rating_type_id) REFERENCES rating_type(id),
     CONSTRAINT unique_attr_rating UNIQUE (listing_review_id, rating_type_id)
   );
+
 `
 
 module.exports.setupDatabase = () => {
@@ -120,22 +123,18 @@ module.exports.dropTestingDatabase = (cb) => {
   });
 }
 
-module.exports.createUser = (users, cb) => {
+module.exports.createUser = (user, cb, counter) => {
   let q = 'INSERT INTO user SET ?';
-  users.forEach((user => {
-    connection.query(q, user, (err, results, fields) => {
-      err ? cb(err, null) : cb(null, results);
-    })
-  }));
+  connection.query(q, user, (err, results, fields) => {
+    err ? cb(err, null, counter) : cb(null, results, counter);
+  });
 };
 
-module.exports.createListing = (listingIDs, cb) => {
+module.exports.createListing = (listing, cb, counter) => {
   let q = 'INSERT INTO listing_review SET ?';
-  listingIDs.forEach((listing => {
-    connection.query(q, listing, (err, results, fields) => {
-      err ? cb(err, null) : cb(null, results);
-    })
-  }));
+  connection.query(q, listing, (err, results, fields) => {
+    err ? cb(err, null, counter) : cb(null, results, counter);
+  })
 };
 
 module.exports.updateListingReviewCount = (list_review_id, cb) => {
@@ -145,35 +144,26 @@ module.exports.updateListingReviewCount = (list_review_id, cb) => {
   });
 };
 
-module.exports.createReview = (review, cb) => {
+module.exports.createReview = (review, cb, counter) => {
   let q = 'INSERT INTO review SET ?';
   connection.query(q, review, (err, results, fields) => {
       if(err) {cb(err, null, review)};
       if(results) {
-          cb(null, results, review);
+          cb(null, results, review, counter);
           module.exports.updateListingReviewCount(review.listing_review_id, (err2, results2) => {
         });
       }
   })
 };
 
-module.exports.createReviews = (reviews, cb) => {
-  reviews.forEach(review => {
-    module.exports.createReview(review, cb);
-  });
-};
-
-module.exports.createReviewReport = (reviewReps, cb) => {
+module.exports.createReviewReport = (reviewRp, cb, counter) => {
   let q = 'INSERT INTO review_report SET ?';
-  reviewReps.forEach((reviewRep => {
-    connection.query(q, reviewRep, (err, results, fields) => {
-      err ? cb(err, null) : cb(null, results);
+    connection.query(q, reviewRp, (err, results, fields) => {
+      err ? cb(err, null, counter) : cb(null, results, counter);
     })
-  }));
 };
 
-
-module.exports.createReviewRating = (reviewRating, listing_review_id, cb) => {
+module.exports.createReviewRating = (reviewRating, listing_review_id, cb, counter) => {
   let q = `INSERT INTO review_rating SET ?;
           INSERT INTO listing_attribute_rating (listing_review_id, rating_type_id, rating_review_count, average_star_rating)
           VALUES (${listing_review_id}, ${reviewRating.rating_type_id}, 1, ${reviewRating.star_ratings})
@@ -194,21 +184,16 @@ module.exports.createReviewRating = (reviewRating, listing_review_id, cb) => {
            WHERE id = ${listing_review_id};
         `;
   connection.query(q, [reviewRating], (err, results, fields) => {
-                        err ? cb(err, null) : cb(null, results);
+                        err ? cb(err, null, counter) : cb(null, results, counter);
                   });
 };
 
-module.exports.createReviewRatings = (reviewRatings, listing_review_id, cb) => {
-  reviewRatings.forEach(reviewRating => {module.exports.createReviewRating(reviewRating, listing_review_id, cb)});
-};
 
-module.exports.createRatingType = (ratingTypes, cb) => {
+module.exports.createRatingType = (ratingType, cb, counter) => {
   let q = 'INSERT INTO rating_type SET ?';
-  ratingTypes.forEach((ratingType => {
-    connection.query(q, ratingType, (err, results, fields) => {
-      err ? cb(err, null) : cb(null, results);
-    })
-  }));
+  connection.query(q, ratingType, (err, results, fields) => {
+    err ? cb(err, null, counter) : cb(null, results,counter);
+  })
 };
 
 module.exports.readRatingNReviewCount = (listingId, cb) => {
@@ -247,7 +232,6 @@ module.exports.readReviewRatings = (listingId, cb) => {
     err? cb(err, null) : cb(null, results);
   });
 }
-
 
 module.exports.connection = connection;
 

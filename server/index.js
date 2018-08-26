@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const db = require('../data/index.js');
 
-if(process.env.NODE_ENV === 'production') {
+if(process.env.NODE_ENV !== 'testing') {
   const mockData = require('../data/mockData.js')
 };
 
