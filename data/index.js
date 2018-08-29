@@ -123,6 +123,13 @@ module.exports.dropTestingDatabase = (cb) => {
   });
 }
 
+module.exports.dropDatabase = (cb) => {
+  let q = `DROP DATABASE IF EXISTS beachrnr`;
+  connection.query(q, [], (err, results, fields) => {
+    err ? cb(err, null) : cb(null, results);
+  });
+}
+
 module.exports.createUser = (user, cb, counter) => {
   let q = 'INSERT INTO user SET ?';
   connection.query(q, user, (err, results, fields) => {
