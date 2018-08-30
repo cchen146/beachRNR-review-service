@@ -1,32 +1,5 @@
-const mysql  = require('mysql');
+const {connection} = require('./index.js');
 
-
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').load();
-};
-
-let host = process.env.MYSQL_HOST;
-let user = process.env.MYSQL_USER;
-let password = process.env.MYSQL_PASSWORD || '';
-let port = process.env.MYSQL_PORT || '';
-
-const connection = mysql.createConnection({
-  host     : host,
-  user     : user,
-  password : password,
-  port     : port,
-  multipleStatements: true
-});
-
-connection.connect((err) => {
-  if(!err) {
-      console.log("Database is connected ... ");
-  } else {
-      console.log("Error connecting database ... ");
-  }
-});
-
-<<<<<<< HEAD
 let currentDB = `${process.env.NODE_ENV === 'test'
                 ? 'beachrnrtesting'
                 : 'beachrnr'}`;
@@ -38,21 +11,19 @@ let query = `
   USE ${currentDB};
 
   CREATE TABLE IF NOT EXISTS user(
-    id BIGINT(8) UNSIGNED AUTO_INCREMENT,
+    id BIGINT(8) UNSIGNED,
     name VARCHAR(200) NOT NULL,
     avatar VARCHAR(500) NOT NULL,
     PRIMARY KEY (id)
   );
 
   CREATE TABLE IF NOT EXISTS listing_review(
-    id BIGINT(8) UNSIGNED AUTO_INCREMENT,
+    id BIGINT(8) UNSIGNED,
     review_count INT(8) NOT NULL DEFAULT 0,
     rating_count INT(8) NOT NULL DEFAULT 0,
     average_rating DOUBLE NOT NULL DEFAULT 0,
     PRIMARY KEY (id)
   );
-
-  ALTER TABLE listing_review AUTO_INCREMENT = 2912000;
 
   CREATE TABLE IF NOT EXISTS review(
     id BIGINT(8) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -67,7 +38,7 @@ let query = `
 
 
   CREATE TABLE IF NOT EXISTS review_report(
-    id BIGINT(8) UNSIGNED AUTO_INCREMENT,
+    id BIGINT(8) UNSIGNED,
     user_id BIGINT(8) UNSIGNED NOT NULL,
     review_id BIGINT(8) UNSIGNED NOT NULL,
     report_content VARCHAR(1000) NOT NULL,
@@ -79,13 +50,13 @@ let query = `
   );
 
   CREATE TABLE IF NOT EXISTS rating_type(
-    id INT(8) UNSIGNED AUTO_INCREMENT,
+    id INT(8) UNSIGNED,
     name VARCHAR(50) NOT NULL UNIQUE,
     PRIMARY KEY (id)
   );
 
   CREATE TABLE IF NOT EXISTS review_rating(
-    id BIGINT(8) UNSIGNED AUTO_INCREMENT,
+    id BIGINT(8) UNSIGNED,
     review_id BIGINT(8) UNSIGNED NOT NULL,
     rating_type_id INT(8) UNSIGNED NOT NULL,
     star_ratings TINYINT(1) NOT NULL,
@@ -100,7 +71,7 @@ let query = `
     id BIGINT(8) UNSIGNED AUTO_INCREMENT,
     listing_review_id BIGINT(8) UNSIGNED NOT NULL,
     rating_type_id INT(8) UNSIGNED NOT NULL,
-    rating_review_count INT(8) UNSIGNED NOT NULL,
+    rating_review_count INT(8) UNSIGNED NOT NULL DEFAULT 0,
     average_star_rating DOUBLE NOT NULL DEFAULT 0,
     PRIMARY KEY (id),
     FOREIGN KEY (listing_review_id) REFERENCES listing_review (id),
@@ -110,12 +81,14 @@ let query = `
 
 `
 
-module.exports.setupDatabase = () => {
-  connection.query(query)
+module.exports.setupDatabase = (cb) => {
+  connection.query(query, [], (err, results, fields) => {
+    err? cb(err, null) : cb (null, results);
+  })
 };
 
 
-module.exports.setupDatabase();
+module.exports.setupDatabase(()=> {});
 
 module.exports.dropTestingDatabase = (cb) => {
   let q = `DROP DATABASE IF EXISTS beachrnrtesting`;
@@ -174,10 +147,10 @@ module.exports.createReviewReport = (reviewRp, cb, counter) => {
 module.exports.createReviewRating = (reviewRating, listing_review_id, cb, counter) => {
   let q = `INSERT INTO review_rating SET ?;
           INSERT INTO listing_attribute_rating (listing_review_id, rating_type_id, rating_review_count, average_star_rating)
-          VALUES (${listing_review_id}, ${reviewRating.rating_type_id}, 1, ${reviewRating.star_ratings})
+          VALUES (?, ?, 1, ?)
           ON DUPLICATE KEY
           UPDATE
-            average_star_rating = (average_star_rating * rating_review_count + ${reviewRating.star_ratings}) / (rating_review_count + 1),
+            average_star_rating = (average_star_rating * rating_review_count + ?) / (rating_review_count + 1),
             rating_review_count = rating_review_count + 1;
 
           UPDATE listing_review
@@ -185,13 +158,21 @@ module.exports.createReviewRating = (reviewRating, listing_review_id, cb, counte
              average_rating = (average_rating * rating_count +
                                       (SELECT average_star_rating
                                         FROM listing_attribute_rating
-                                        WHERE listing_review_id = ${listing_review_id}
-                                          AND rating_type_id = ${reviewRating.rating_type_id})
+                                        WHERE listing_review_id = ?
+                                          AND rating_type_id = ?)
                               ) / (rating_count + 1),
              rating_count = rating_count + 1
-           WHERE id = ${listing_review_id};
+           WHERE id = ?;
         `;
-  connection.query(q, [reviewRating], (err, results, fields) => {
+  const options = [reviewRating,
+                   listing_review_id, reviewRating.rating_type_id, reviewRating.star_ratings,
+                   reviewRating.star_ratings,
+                   listing_review_id,
+                   reviewRating.rating_type_id,
+                   listing_review_id
+                  ];
+
+  connection.query(q, options, (err, results, fields) => {
                         err ? cb(err, null, counter) : cb(null, results, counter);
                   });
 };
@@ -240,15 +221,3 @@ module.exports.readReviewRatings = (listingId, cb) => {
     err? cb(err, null) : cb(null, results);
   });
 }
-
-=======
->>>>>>> improve performance of massive upload from 11 hours to 12 mins for 10M records
-module.exports.connection = connection;
-
-
-
-
-
-
-
-
