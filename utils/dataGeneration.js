@@ -41,6 +41,7 @@ const findFiles = filePattern => {
 
 
 const deleteDirFilesUsingPattern = async (pattern, dirPath = __dirname) => {
+    console.log('dirPath + pattern>>>>' + dirPath + pattern);
     const files = await findFiles(dirPath + pattern);
     for(let file of files) {
       await removeFile(file);

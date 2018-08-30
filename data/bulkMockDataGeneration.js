@@ -25,7 +25,7 @@ const generateBychunks = (filePath, label, chunkSize, totalRecords, inputClass) 
 }
 
 
-const generateMockData = async (mockSize, chunk) => {
+const generateMockData = (mockSize, chunk) => {
 
     let numOfChunks = mockSize / chunk;
     
