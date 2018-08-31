@@ -3,21 +3,13 @@ const fs = require('fs');
 const glob = require("glob");
 
 
-const writeCsvAsync = (filepath, filename, fileext, inputArr) => {
-    return new Promise ((resolve, reject) => {
-        let json2csvParser = new Json2csvParser();
-        let csv = json2csvParser.parse(inputArr);
-        let fileName = `${filepath}/${filename}.${fileext}`;
-        fs.writeFile(fileName, csv, err => {
-            err? reject(err) : resolve('done');
-        })
-    })
-};
-
 const writeCsv = (filepath, filename, fileext, inputArr, cb) => {
         let json2csvParser = new Json2csvParser();
         let csv = json2csvParser.parse(inputArr);
         let fileName = `${filepath}/${filename}.${fileext}`;
+        if (!fs.existsSync(filepath)){
+            fs.mkdirSync(filepath);
+        };
         fs.writeFile(fileName, csv, err => {
             err? cb(err, null) : cb(null, 'done');
         })
