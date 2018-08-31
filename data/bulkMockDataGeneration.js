@@ -1,4 +1,4 @@
-const {writeCsv, deleteDirFilesUsingPattern} = require('../utils/dataGeneration.js');
+const {writeCsv} = require('../utils/dataGeneration.js');
 const faker = require('faker');
 const moment = require('moment');
 moment().format();
