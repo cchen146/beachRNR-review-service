@@ -223,12 +223,25 @@ module.exports.readReviewRatings = (listingId, cb) => {
 }
 
 module.exports.updateReviewCount = (cb) => {
-  let q = `UPDATE listing_review
-            INNER JOIN (SELECT listing_review_id, count(*) AS review_count
-                FROM review GROUP BY listing_review_id
-              ) AS listing_review_count
-            ON listing_review.id = listing_review_count.listing_review_id
-            SET listing_review.review_count = listing_review_count.review_count
+  let q = `
+            CREATE TABLE temp AS
+            SELECT r.listing_review_id AS id, count(r.id) AS review_count
+            FROM 
+              review r
+            GROUP BY 
+              r.listing_review_id
+            ;
+            
+            CREATE INDEX listing_review_id_index ON temp(id);
+            
+            UPDATE listing_review lr
+            INNER JOIN temp lru
+            ON lr.id = lru.id
+            SET
+              lr.review_count = lru.review_count
+            ;
+            
+            DROP TABLE temp;
           `;
   connection.query(q, [], (err, results, fields) => {
     err? cb(err, null) : cb(null, results);
@@ -236,19 +249,42 @@ module.exports.updateReviewCount = (cb) => {
 }
 
 module.exports.updateListingRatings = (cb) => {
-  let q = `UPDATE listing_review
-            INNER JOIN (
-                  SELECT R.listing_review_id, sum(RRS.rating_count) AS rating_count, avg(RRS.avg_star_ratings)  AS avg_star_ratings
-                  FROM review AS R
-                  INNER JOIN 
-                    (SELECT review_id, count(id) AS rating_count, avg(star_ratings) AS avg_star_ratings
-                    FROM review_rating
-                    GROUP BY review_id) AS RRS
-                  ON R.id = RRS.review_id
-                  GROUP BY R.listing_review_id
-                  ) AS LRS
-            ON listing_review.id = LRS.listing_review_id
-            SET listing_review.rating_count = LRS.rating_count, listing_review.average_rating = LRS.avg_star_ratings
+  let q = `CREATE TABLE temp AS 
+              SELECT
+                  listing_review_id,
+                    sum(rating_count)     AS rating_count,
+                    avg(avg_star_ratings)   AS avg_star_ratings
+                FROM(
+                  SELECT
+                    r.listing_review_id,
+                    rr.review_id,
+                    count(rr.id)      AS rating_count,
+                    avg(rr.star_ratings)  AS avg_star_ratings
+                  FROM
+                    review_rating rr
+                  INNER JOIN
+                    review r
+                  ON
+                    rr.review_id = r.listing_review_id
+                  GROUP BY
+                    r.listing_review_id,
+                    rr.review_id
+                ) a
+                GROUP BY
+                  listing_review_id
+          ;
+          
+          CREATE INDEX listing_review_id_unique ON temp(listing_review_id);
+          
+          UPDATE listing_review
+          INNER JOIN temp  AS lrs
+          ON listing_review.id = lrs.listing_review_id
+          SET
+            listing_review.rating_count = lrs.rating_count, 
+            listing_review.average_rating = lrs.avg_star_ratings
+          ;
+          
+          DROP TABLE temp;
           `;
     connection.query(q, [], (err, results, fields) => {
       err? cb(err, null) : cb(null, results);
@@ -257,17 +293,27 @@ module.exports.updateListingRatings = (cb) => {
 
 module.exports.updateListingAttrRatings = (cb) => {
   let q = `INSERT INTO listing_attribute_rating
-            (listing_review_id, rating_type_id, rating_review_count, average_star_rating)
-            SELECT * FROM
-              (SELECT R.listing_review_id, RR.rating_type_id, count(RR.review_id) AS rating_review_count, avg(RR.star_ratings) AS average_star_rating
-              FROM review AS R
-              INNER JOIN
-                (SELECT * FROM review_rating) AS RR
-              ON R.id = RR.review_id
-              GROUP BY R.listing_review_id, RR.rating_type_id) AS NLAR
-            ON DUPLICATE KEY UPDATE 
-              rating_review_count = NLAR. rating_review_count, 
-                average_star_rating = NLAR.average_star_rating;
+                      (listing_review_id, 
+                      rating_type_id, 
+                      rating_review_count, 
+                      average_star_rating)
+              SELECT * FROM
+                (SELECT  r.listing_review_id,
+                    rr.rating_type_id, 
+                    count(rr.review_id) AS rating_review_count, 
+                    avg(rr.star_ratings) AS average_star_rating
+                  FROM review r
+                  INNER JOIN
+                    review_rating rr
+                  ON 
+                    r.id =rr.review_id
+                  GROUP BY 
+                    r.listing_review_id,
+                    rr.rating_type_id) nlar
+              ON DUPLICATE KEY UPDATE 
+                rating_review_count = nlar. rating_review_count, 
+                  average_star_rating = nlar.average_star_rating
+              ;
           `;
     connection.query(q, [], (err, results, fields) => {
       err? cb(err, null) : cb(null, results);
