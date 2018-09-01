@@ -157,7 +157,7 @@ const generateMassMockData = async (numOfChunks, chunkSize) => {
 }
 
 
-generateMassMockData(1, 1000);
+// generateMassMockData(1, 1000);
 
 
 
