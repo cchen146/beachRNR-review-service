@@ -20,7 +20,7 @@
 
 - Url: http://ec2-54-67-103-194.us-west-1.compute.amazonaws.com/rooms/:roomID/reviews/content
 - Method: GET
-- Params: roomID must be between 2912000 to 2012999
+- Params: roomID must be between 2912000 to 2912999
 - Output Format: List of Objects
 - Output Sample:
     ```
@@ -40,7 +40,7 @@
 > *Review Content API (50-100 records per listing)*
 - Url: http://ec2-54-67-103-194.us-west-1.compute.amazonaws.com/rooms/:roomID/reviews/ratings
 - Method: GET
-- Params: roomID must be between 2912000 to 2012999
+- Params: roomID must be between 2912000 to 2912999
 - Output Format: List of Objects
 - Output Sample:
     ```
@@ -56,7 +56,7 @@
 > *Review Content API (50-100 records per listing)*
 - Url: http://ec2-54-67-103-194.us-west-1.compute.amazonaws.com/rooms/:roomID/reviews/ratingnreviewcount
 - Method: GET
-- Params: roomID must be between 2912000 to 2012999
+- Params: roomID must be between 2912000 to 2912999
 - Output Format: List of Objects
 - Output Sample:
     ```
